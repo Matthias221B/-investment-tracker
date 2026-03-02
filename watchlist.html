@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>👀 观察列表 - 投资追踪</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { color: white; font-size: 1.5rem; }
+        .navbar nav { display: flex; gap: 1.5rem; }
+        .navbar nav a { color: rgba(255,255,255,0.8); text-decoration: none; }
+        .navbar nav a:hover, .navbar nav a.active { color: #00D4AA; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #4a5568; margin-bottom: 1rem; }
+        .form-row { display: flex; gap: 1rem; max-width: 600px; }
+        .form-group { flex: 1; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; border: none; background: #38a169; color: white; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; color: #4a5568; }
+        .positive { color: #38a169; }
+        .negative { color: #e53e3e; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📊 投资追踪</h1>
+        <nav>
+            <a href="/dashboard">仪表板</a>
+            <a href="/holdings">持仓</a>
+            <a href="/transactions">交易</a>
+            <a href="/watchlist" class="active">观察</a>
+            <a href="/journal">日记</a>
+            <a href="/risk">风险</a>
+        </nav>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>➕ 添加观察股票</h2>
+            <form onsubmit="addWatch(event)" class="form-row">
+                <div class="form-group"><input type="text" id="symbol" placeholder="股票代码" required></div>
+                <button type="submit" class="btn">添加</button>
+            </form>
+        </div>
+        <div class="card">
+            <h2>👀 观察列表</h2>
+            <table><thead><tr><th>代码</th><th>现价</th><th>涨跌</th><th>涨跌幅</th></tr></thead>
+            <tbody id="watch-body"></tbody></table>
+        </div>
+    </div>
+    <script>
+        async function loadWatch() {
+            const res = await fetch('/api/watchlist');
+            const list = await res.json();
+            document.getElementById('watch-body').innerHTML = list.map(w => `
+                <tr><td><strong>${w.symbol}</strong></td><td>¥${(w.price||0).toFixed(2)}</td>
+                <td class="${(w.change||0)>=0?'positive':'negative'}">${(w.change||0)>=0?'+':''}${(w.change||0).toFixed(2)}</td>
+                <td class="${(w.change_percent||0)>=0?'positive':'negative'}">${(w.change_percent||0)>=0?'+':''}${(w.change_percent||0).toFixed(2)}%</td></tr>
+            `).join('');
+        }
+        async function addWatch(e) {
+            e.preventDefault();
+            await fetch('/api/watchlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol: document.getElementById('symbol').value.toUpperCase() })
+            });
+            document.getElementById('symbol').value = '';
+            loadWatch();
+        }
+        loadWatch();
+    </script>
+</body>
+</html>

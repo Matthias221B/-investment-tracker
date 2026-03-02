@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>📝 交易记录 - 投资追踪</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { color: white; font-size: 1.5rem; }
+        .navbar nav { display: flex; gap: 1.5rem; }
+        .navbar nav a { color: rgba(255,255,255,0.8); text-decoration: none; }
+        .navbar nav a:hover, .navbar nav a.active { color: #00D4AA; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #4a5568; margin-bottom: 1rem; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; color: #4a5568; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 1rem; }
+        .btn { padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; border: none; }
+        .btn-success { background: #38a169; color: white; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; color: #4a5568; }
+        .buy { color: #38a169; }
+        .sell { color: #e53e3e; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📊 投资追踪</h1>
+        <nav>
+            <a href="/dashboard">仪表板</a>
+            <a href="/holdings">持仓</a>
+            <a href="/transactions" class="active">交易</a>
+            <a href="/watchlist">观察</a>
+            <a href="/journal">日记</a>
+            <a href="/risk">风险</a>
+        </nav>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>📝 记录交易</h2>
+            <form onsubmit="addTransaction(event)" class="form-row">
+                <div class="form-group"><label>股票代码 *</label><input type="text" id="symbol" required></div>
+                <div class="form-group"><label>交易类型 *</label>
+                    <select id="type"><option value="BUY">买入</option><option value="SELL">卖出</option></select>
+                </div>
+                <div class="form-group"><label>数量 *</label><input type="number" id="quantity" step="0.01" required></div>
+                <div class="form-group"><label>成交价 *</label><input type="number" id="price" step="0.01" required></div>
+                <div class="form-group"><label>手续费</label><input type="number" id="fee" step="0.01" value="0"></div>
+                <div class="form-group"><label>交易日期 *</label><input type="date" id="date" required></div>
+                <div class="form-group"><button type="submit" class="btn btn-success">记录</button></div>
+            </form>
+        </div>
+        <div class="card">
+            <h2>📜 交易历史</h2>
+            <table><thead><tr><th>日期</th><th>代码</th><th>类型</th><th>数量</th><th>价格</th><th>总额</th></tr></thead>
+            <tbody id="tx-body"></tbody></table>
+        </div>
+    </div>
+    <script>
+        document.getElementById('date').valueAsDate = new Date();
+        async function loadTx() {
+            const res = await fetch('/api/transactions');
+            const txs = await res.json();
+            document.getElementById('tx-body').innerHTML = txs.map(tx => `
+                <tr><td>${tx.trade_date}</td><td>${tx.symbol}</td>
+                <td class="${tx.type==='BUY'?'buy':'sell'}">${tx.type==='BUY'?'买入':'卖出'}</td>
+                <td>${tx.quantity.toFixed(2)}</td><td>¥${tx.price.toFixed(2)}</td><td>¥${tx.total.toFixed(2)}</td></tr>
+            `).join('');
+        }
+        async function addTransaction(e) {
+            e.preventDefault();
+            const qty = parseFloat(document.getElementById('quantity').value);
+            const price = parseFloat(document.getElementById('price').value);
+            const fee = parseFloat(document.getElementById('fee').value) || 0;
+            const type = document.getElementById('type').value;
+            await fetch('/api/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symbol: document.getElementById('symbol').value.toUpperCase(),
+                    type, quantity: qty, price, fee,
+                    total: type==='BUY' ? qty*price+fee : qty*price-fee,
+                    trade_date: document.getElementById('date').value
+                })
+            });
+            e.target.reset();
+            document.getElementById('date').valueAsDate = new Date();
+            loadTx();
+        }
+        loadTx();
+    </script>
+</body>
+</html>

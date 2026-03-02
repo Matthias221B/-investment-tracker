@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>⚠️ 风险分析 - 投资追踪</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { color: white; font-size: 1.5rem; }
+        .navbar nav { display: flex; gap: 1.5rem; }
+        .navbar nav a { color: rgba(255,255,255,0.8); text-decoration: none; }
+        .navbar nav a:hover, .navbar nav a.active { color: #00D4AA; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #4a5568; margin-bottom: 1rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-card .label { color: #718096; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 1.8rem; font-weight: bold; color: #2d3748; }
+        .risk-high { color: #e53e3e; }
+        .risk-medium { color: #dd6b20; }
+        .risk-low { color: #38a169; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; color: #4a5568; }
+        .progress { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #00D4AA, #00a88a); }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📊 投资追踪</h1>
+        <nav>
+            <a href="/dashboard">仪表板</a>
+            <a href="/holdings">持仓</a>
+            <a href="/transactions">交易</a>
+            <a href="/watchlist">观察</a>
+            <a href="/journal">日记</a>
+            <a href="/risk" class="active">风险</a>
+        </nav>
+    </div>
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="label">总资产</div><div class="value" id="total-value">¥0</div></div>
+            <div class="stat-card"><div class="label">持仓数量</div><div class="value" id="count">0</div></div>
+            <div class="stat-card"><div class="label">风险等级</div><div class="value" id="risk-level">-</div></div>
+        </div>
+        <div class="card">
+            <h2>📊 持仓集中度</h2>
+            <table><thead><tr><th>股票</th><th>占比</th><th>风险</th></tr></thead><tbody id="conc-body"></tbody></table>
+        </div>
+        <div class="card">
+            <h2>🌍 市场分布</h2>
+            <div id="market-dist"></div>
+        </div>
+    </div>
+    <script>
+        async function loadRisk() {
+            const res = await fetch('/api/portfolio/risk');
+            const data = await res.json();
+            document.getElementById('total-value').textContent = '¥' + (data.total_value||0).toLocaleString();
+            document.getElementById('count').textContent = data.holdings_count || 0;
+            const riskEl = document.getElementById('risk-level');
+            riskEl.textContent = data.risk_level || '-';
+            riskEl.className = 'value risk-' + (data.risk_level==='高'?'high':data.risk_level==='中'?'medium':'low');
+            
+            document.getElementById('conc-body').innerHTML = (data.concentrations||[]).map(c => `
+                <tr><td><strong>${c.symbol}</strong></td><td><div class="progress"><div class="progress-bar" style="width:${c.percent}%"></div></div>${c.percent}%</td>
+                <td class="risk-${c.risk==='高'?'high':c.risk==='中'?'medium':'low'}">${c.risk}</td></tr>
+            `).join('');
+            
+            if (data.market_distribution) {
+                document.getElementById('market-dist').innerHTML = `
+                    <p>美股：${data.market_distribution.US}% | 港股：${data.market_distribution.HK}%</p>
+                `;
+            }
+        }
+        loadRisk();
+    </script>
+</body>
+</html>

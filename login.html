@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 登录 - 投资追踪</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .logo h1 { color: #1a1a2e; font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .logo p { color: #666; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; color: #333; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-group input {
+            width: 100%; padding: 0.875rem 1rem;
+            border: 2px solid #e2e8f0; border-radius: 8px;
+            font-size: 1rem; transition: border-color 0.3s;
+        }
+        .form-group input:focus { outline: none; border-color: #00D4AA; }
+        .btn-login {
+            width: 100%; padding: 1rem;
+            background: linear-gradient(135deg, #00D4AA 0%, #00a88a 100%);
+            color: white; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,212,170,0.3); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .error-message {
+            background: #fed7d7; color: #742a2a;
+            padding: 0.75rem 1rem; border-radius: 6px;
+            margin-bottom: 1rem; display: none;
+        }
+        .error-message.show { display: block; }
+        .footer { text-align: center; margin-top: 2rem; color: #666; font-size: 0.85rem; }
+        .security-badge {
+            display: flex; justify-content: center; gap: 1rem;
+            margin-top: 1.5rem; padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        .security-badge span { color: #666; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>📊 投资追踪</h1>
+            <p>安全 · 专业 · 私密</p>
+        </div>
+        <div id="error-message" class="error-message"></div>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" placeholder="请输入用户名" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" placeholder="请输入密码" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-login" id="login-btn">登录</button>
+        </form>
+        <div class="security-badge">
+            <span>🔒 私有部署</span>
+            <span>🛡️ 本地存储</span>
+            <span>🔐 隐私保护</span>
+        </div>
+        <div class="footer">
+            <p>小瑜为惜知打造 💼</p>
+            <p style="margin-top: 0.5rem;">数据仅你可见 · 完全私有</p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const errorDiv = document.getElementById('error-message');
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            btn.disabled = true;
+            btn.textContent = '登录中...';
+            errorDiv.classList.remove('show');
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    btn.textContent = '✅ 登录成功';
+                    setTimeout(() => window.location.href = '/dashboard', 500);
+                } else {
+                    throw new Error(data.error || '登录失败');
+                }
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.add('show');
+                btn.disabled = false;
+                btn.textContent = '登录';
+            }
+        });
+    </script>
+</body>
+</html>

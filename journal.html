@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>📝 投资日记 - 投资追踪</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { color: white; font-size: 1.5rem; }
+        .navbar nav { display: flex; gap: 1.5rem; }
+        .navbar nav a { color: rgba(255,255,255,0.8); text-decoration: none; }
+        .navbar nav a:hover, .navbar nav a.active { color: #00D4AA; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #4a5568; margin-bottom: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; color: #4a5568; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 1rem; }
+        .form-group textarea { min-height: 150px; resize: vertical; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; border: none; background: #00D4AA; color: white; }
+        .entry { background: #f7fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #00D4AA; }
+        .entry .meta { color: #718096; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .entry .content { color: #2d3748; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📊 投资追踪</h1>
+        <nav>
+            <a href="/dashboard">仪表板</a>
+            <a href="/holdings">持仓</a>
+            <a href="/transactions">交易</a>
+            <a href="/watchlist">观察</a>
+            <a href="/journal" class="active">日记</a>
+            <a href="/risk">风险</a>
+        </nav>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>📝 写投资日记</h2>
+            <form onsubmit="addEntry(event)">
+                <div class="form-group"><label>相关股票</label><input type="text" id="symbol" placeholder="如：AAPL（可选）"></div>
+                <div class="form-group"><label>标题 *</label><input type="text" id="title" required></div>
+                <div class="form-group"><label>内容 *</label><textarea id="content" required></textarea></div>
+                <button type="submit" class="btn">保存</button>
+            </form>
+        </div>
+        <div class="card">
+            <h2>📖 我的日记</h2>
+            <div id="entries"></div>
+        </div>
+    </div>
+    <script>
+        async function loadEntries() {
+            const res = await fetch('/api/journal');
+            const entries = await res.json();
+            document.getElementById('entries').innerHTML = entries.map(e => `
+                <div class="entry"><div class="meta">${e.created_at?.slice(0,16).replace('T',' ')} ${e.symbol?'· '+e.symbol:''}</div>
+                <strong>${e.title}</strong><div class="content">${e.content}</div></div>
+            `).join('');
+        }
+        async function addEntry(e) {
+            e.preventDefault();
+            await fetch('/api/journal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symbol: document.getElementById('symbol').value.toUpperCase(),
+                    title: document.getElementById('title').value,
+                    content: document.getElementById('content').value
+                })
+            });
+            document.getElementById('symbol').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('content').value = '';
+            loadEntries();
+        }
+        loadEntries();
+    </script>
+</body>
+</html>

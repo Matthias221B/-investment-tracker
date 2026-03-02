@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 持仓管理 - 投资追踪</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { color: white; font-size: 1.5rem; }
+        .navbar nav { display: flex; gap: 1.5rem; }
+        .navbar nav a { color: rgba(255,255,255,0.8); text-decoration: none; }
+        .navbar nav a:hover, .navbar nav a.active { color: #00D4AA; }
+        .navbar .user-info { color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 1rem; }
+        .navbar .logout-btn { background: rgba(255,255,255,0.1); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #4a5568; margin-bottom: 1rem; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; color: #4a5568; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #00D4AA; }
+        .btn { padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; border: none; font-size: 0.9rem; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-danger { background: #e53e3e; color: white; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; color: #4a5568; }
+        .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        .badge-us { background: #bee3f8; color: #2c5282; }
+        .badge-hk { background: #fef3c7; color: #92400e; }
+        .hint { background: #f0f4ff; padding: 1rem; border-radius: 8px; border-left: 4px solid #00D4AA; margin-top: 1rem; color: #4a5568; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📊 投资追踪</h1>
+        <nav>
+            <a href="/dashboard">仪表板</a>
+            <a href="/holdings" class="active">持仓</a>
+            <a href="/transactions">交易</a>
+            <a href="/watchlist">观察</a>
+            <a href="/journal">日记</a>
+            <a href="/risk">风险</a>
+        </nav>
+        <div class="user-info">
+            <span id="username">用户</span>
+            <button class="logout-btn" onclick="logout()">退出</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>➕ 添加持仓（看长桥 App 截图输入）</h2>
+            <form onsubmit="addHolding(event)" class="form-row">
+                <div class="form-group">
+                    <label>股票代码 *</label>
+                    <input type="text" id="symbol" placeholder="如：AAPL, 0700.HK" required>
+                </div>
+                <div class="form-group">
+                    <label>股票名称</label>
+                    <input type="text" id="name" placeholder="如：苹果公司">
+                </div>
+                <div class="form-group">
+                    <label>持仓数量 *</label>
+                    <input type="number" id="quantity" step="0.01" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label>成本价 *</label>
+                    <input type="number" id="cost" step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label>市场</label>
+                    <select id="market">
+                        <option value="US">美股</option>
+                        <option value="HK">港股</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" id="notes" placeholder="可选">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">添加持仓</button>
+                </div>
+            </form>
+            <div class="hint">
+                <p>💡 打开长桥 App → 查看持仓 → 将每只股票的代码、数量、成本价输入到这里</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>📋 持仓列表</h2>
+            <table>
+                <thead>
+                    <tr><th>代码</th><th>名称</th><th>市场</th><th>数量</th><th>成本价</th><th>备注</th><th>操作</th></tr>
+                </thead>
+                <tbody id="holdings-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function checkAuth() {
+            const res = await fetch('/api/check_auth');
+            if (!res.ok) { window.location.href = '/login'; return; }
+            const data = await res.json();
+            document.getElementById('username').textContent = data.user.username;
+        }
+        
+        async function loadHoldings() {
+            const res = await fetch('/api/holdings');
+            const holdings = await res.json();
+            const tbody = document.getElementById('holdings-body');
+            tbody.innerHTML = holdings.map(h => `
+                <tr>
+                    <td><strong>${h.symbol}</strong></td>
+                    <td>${h.name || '-'}</td>
+                    <td><span class="badge badge-${h.market.toLowerCase()}">${h.market}</span></td>
+                    <td>${h.quantity.toFixed(2)}</td>
+                    <td>¥${h.cost_basis.toFixed(2)}</td>
+                    <td>${h.notes || '-'}</td>
+                    <td><button class="btn btn-danger" onclick="deleteHolding(${h.id})">删除</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        async function addHolding(e) {
+            e.preventDefault();
+            await fetch('/api/holdings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symbol: document.getElementById('symbol').value.toUpperCase(),
+                    name: document.getElementById('name').value,
+                    quantity: parseFloat(document.getElementById('quantity').value),
+                    cost_basis: parseFloat(document.getElementById('cost').value),
+                    market: document.getElementById('market').value,
+                    notes: document.getElementById('notes').value
+                })
+            });
+            e.target.reset();
+            loadHoldings();
+        }
+        
+        async function deleteHolding(id) {
+            if (!confirm('确定删除？')) return;
+            await fetch(`/api/holdings/${id}`, { method: 'DELETE' });
+            loadHoldings();
+        }
+        
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login';
+        }
+        
+        checkAuth();
+        loadHoldings();
+    </script>
+</body>
+</html>
