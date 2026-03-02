@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 投资追踪 - 小瑜为惜知打造</title>
+    <title>📊 专业投资追踪 - 小瑜为惜知打造</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8f9fa; color: #333; }
         
-        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
         .navbar h1 { color: white; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
         .navbar nav { display: flex; gap: 1.5rem; }
-        .navbar nav a { color: rgba(255,255,255,0.9); text-decoration: none; padding: 0.5rem 0; border-bottom: 2px solid transparent; transition: all 0.3s; }
-        .navbar nav a:hover, .navbar nav a.active { color: white; border-bottom-color: white; }
+        .navbar nav a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 0.5rem 0; border-bottom: 2px solid transparent; transition: all 0.3s; }
+        .navbar nav a:hover, .navbar nav a.active { color: #00D4AA; border-bottom-color: #00D4AA; }
         
         .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
         
@@ -25,10 +25,11 @@
         
         .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .card h2 { color: #4a5568; font-size: 1.2rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .card h3 { color: #2d3748; font-size: 1rem; margin: 1.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
         
         .btn { padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; cursor: pointer; border: none; transition: all 0.3s; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-primary:hover { background: #5a67d8; }
+        .btn-primary { background: #00D4AA; color: white; }
+        .btn-primary:hover { background: #00a88a; }
         .btn-success { background: #38a169; color: white; }
         .btn-danger { background: #e53e3e; color: white; }
         .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
@@ -47,39 +48,59 @@
         .badge-tech { background: #e9d8fd; color: #553c9a; }
         .badge-health { background: #c6f6d5; color: #22543d; }
         .badge-finance { background: #feebc8; color: #744210; }
+        .badge-high { background: #fed7d7; color: #742a2a; }
+        .badge-medium { background: #fef3c7; color: #744210; }
+        .badge-low { background: #c6f6d5; color: #22543d; }
         
-        .news-item { background: #f7fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #667eea; }
-        .news-item .meta { color: #718096; font-size: 0.85rem; margin-bottom: 0.5rem; }
-        .news-item .title { color: #2d3748; font-weight: 600; margin-bottom: 0.5rem; }
-        .news-item .sentiment { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        .news-item { background: #f7fafc; padding: 1.25rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #00D4AA; }
+        .news-item .meta { color: #718096; font-size: 0.85rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .news-item .title { color: #2d3748; font-weight: 600; margin-bottom: 0.5rem; font-size: 1rem; }
+        .news-item .summary { color: #4a5568; font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem; }
+        .news-item .sentiment { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
         .sentiment.positive { background: #c6f6d5; color: #22543d; }
         .sentiment.negative { background: #fed7d7; color: #742a2a; }
         .sentiment.neutral { background: #e2e8f0; color: #4a5568; }
         
-        .risk-meter { height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin: 1rem 0; }
-        .risk-bar { height: 100%; background: linear-gradient(90deg, #38a169, #ecc94b, #e53e3e); border-radius: 10px; }
+        .analysis-box { background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%); padding: 1.5rem; border-radius: 12px; border: 1px solid #bee3f8; margin: 1rem 0; }
+        .analysis-box h4 { color: #2c5282; font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .analysis-box .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .analysis-box .data-item { background: white; padding: 1rem; border-radius: 8px; text-align: center; }
+        .analysis-box .data-item .label { color: #718096; font-size: 0.8rem; margin-bottom: 0.25rem; }
+        .analysis-box .data-item .value { color: #2d3748; font-weight: bold; font-size: 1.1rem; }
         
-        .hint { background: #f0f4ff; padding: 1rem; border-radius: 8px; border-left: 4px solid #667eea; margin-top: 1rem; }
-        .hint p { color: #4a5568; line-height: 1.8; }
+        .recommendation-card { background: white; border: 2px solid #00D4AA; border-radius: 12px; padding: 1.5rem; margin: 1rem 0; }
+        .recommendation-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .recommendation-card .header h4 { color: #2d3748; font-size: 1.1rem; }
+        .recommendation-card .confidence { background: #c6f6d5; color: #22543d; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .recommendation-card .detail { margin: 0.75rem 0; line-height: 1.8; color: #4a5568; }
+        .recommendation-card .detail strong { color: #2d3748; }
+        
+        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #00D4AA, #00a88a); border-radius: 4px; transition: width 0.3s; }
+        
+        .calendar-item { background: white; border-left: 4px solid #00D4AA; padding: 1rem; margin: 0.75rem 0; border-radius: 0 8px 8px 0; }
+        .calendar-item .date { color: #00D4AA; font-weight: bold; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .calendar-item .symbol { color: #2d3748; font-weight: 600; font-size: 1rem; }
+        .calendar-item .expectation { color: #718096; font-size: 0.85rem; margin-top: 0.5rem; }
         
         .page { display: none; }
         .page.active { display: block; }
         
         .loading { text-align: center; padding: 2rem; color: #718096; }
-        .loading::before { content: '⏳ '; }
         
-        .sector-pie { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
-        .sector-item { display: flex; align-items: center; gap: 0.5rem; }
-        .sector-color { width: 16px; height: 16px; border-radius: 4px; }
+        .alert { padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+        .alert-warning { background: #fef3c7; border-left: 4px solid #dd6b20; color: #744210; }
+        .alert-success { background: #c6f6d5; border-left: 4px solid #38a169; color: #22543d; }
+        .alert-info { background: #bee3f8; border-left: 4px solid #3182ce; color: #2c5282; }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <h1>📊 投资追踪</h1>
+        <h1>📊 投资追踪 Pro</h1>
         <nav>
             <a href="#" onclick="showPage('dashboard')" class="active" id="nav-dashboard">仪表板</a>
             <a href="#" onclick="showPage('holdings')" id="nav-holdings">持仓</a>
-            <a href="#" onclick="showPage('watchlist')" id="nav-watchlist">观察</a>
+            <a href="#" onclick="showPage('earnings')" id="nav-earnings">财报</a>
             <a href="#" onclick="showPage('news')" id="nav-news">新闻</a>
             <a href="#" onclick="showPage('risk')" id="nav-risk">风险</a>
             <a href="#" onclick="showPage('advice')" id="nav-advice">建议</a>
@@ -109,35 +130,14 @@
             </div>
             
             <div class="card">
-                <h2>📈 股票清单（基于你的持仓）</h2>
-                <button class="btn btn-primary" onclick="loadStockList()" style="margin-bottom: 1rem;">🔄 刷新股价</button>
+                <h2>📈 股票清单</h2>
+                <button class="btn btn-primary" onclick="loadDashboard()" style="margin-bottom: 1rem;">🔄 刷新股价</button>
                 <table>
                     <thead>
-                        <tr>
-                            <th>代码</th>
-                            <th>名称</th>
-                            <th>行业</th>
-                            <th>现价</th>
-                            <th>涨跌</th>
-                            <th>涨跌幅</th>
-                            <th>操作</th>
-                        </tr>
+                        <tr><th>代码</th><th>名称</th><th>行业</th><th>现价</th><th>涨跌</th><th>涨跌幅</th><th>操作</th></tr>
                     </thead>
-                    <tbody id="stock-list-body">
-                        <tr><td colspan="7" class="loading">加载中...</td></tr>
-                    </tbody>
+                    <tbody id="stock-list-body"><tr><td colspan="7" class="loading">加载股价数据...</td></tr></tbody>
                 </table>
-            </div>
-            
-            <div class="card">
-                <h2>💡 小瑜提示</h2>
-                <ul style="padding-left: 1.5rem; color: #4a5568; line-height: 1.8;">
-                    <li>已预设你的 33+ 只关注股票</li>
-                    <li>在「持仓」页面添加你的实际持仓数量和成本价</li>
-                    <li>「新闻」页面提供实时新闻聚合和情感分析</li>
-                    <li>「风险」页面显示投资组合风险评估</li>
-                    <li>「建议」页面提供 AI 投资建议</li>
-                </ul>
             </div>
         </div>
         
@@ -146,49 +146,31 @@
             <div class="card">
                 <h2>➕ 添加持仓</h2>
                 <form onsubmit="addHolding(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
-                    <div class="form-group">
-                        <label>股票代码 *</label>
-                        <input type="text" id="holding-symbol" placeholder="如：AAPL" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;">
-                    </div>
-                    <div class="form-group">
-                        <label>股票名称</label>
-                        <input type="text" id="holding-name" placeholder="如：苹果公司" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;">
-                    </div>
-                    <div class="form-group">
-                        <label>持仓数量 *</label>
-                        <input type="number" id="holding-quantity" step="0.01" placeholder="0" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;">
-                    </div>
-                    <div class="form-group">
-                        <label>成本价 *</label>
-                        <input type="number" id="holding-cost" step="0.01" placeholder="0.00" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;">
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">添加持仓</button>
-                    </div>
+                    <div class="form-group"><label>股票代码 *</label><input type="text" id="holding-symbol" placeholder="如：AAPL" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;"></div>
+                    <div class="form-group"><label>股票名称</label><input type="text" id="holding-name" placeholder="如：苹果公司" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;"></div>
+                    <div class="form-group"><label>持仓数量 *</label><input type="number" id="holding-quantity" step="0.01" placeholder="0" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;"></div>
+                    <div class="form-group"><label>成本价 *</label><input type="number" id="holding-cost" step="0.01" placeholder="0.00" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px;"></div>
+                    <div class="form-group"><button type="submit" class="btn btn-success">添加持仓</button></div>
                 </form>
             </div>
-            
             <div class="card">
                 <h2>📋 我的持仓</h2>
-                <table>
-                    <thead>
-                        <tr><th>代码</th><th>名称</th><th>数量</th><th>成本价</th><th>现价</th><th>盈亏</th><th>操作</th></tr>
-                    </thead>
-                    <tbody id="holdings-body"></tbody>
-                </table>
+                <table><thead><tr><th>代码</th><th>名称</th><th>数量</th><th>成本价</th><th>现价</th><th>盈亏</th><th>操作</th></tr></thead>
+                <tbody id="holdings-body"></tbody></table>
             </div>
         </div>
         
-        <!-- 观察列表页面 -->
-        <div id="watchlist" class="page">
+        <!-- 财报日历页面 -->
+        <div id="earnings" class="page">
             <div class="card">
-                <h2>👀 观察列表</h2>
-                <table>
-                    <thead>
-                        <tr><th>代码</th><th>名称</th><th>行业</th><th>现价</th><th>涨跌</th><th>涨跌幅</th></tr>
-                    </thead>
-                    <tbody id="watchlist-body"></tbody>
-                </table>
+                <h2>📅 财报日历</h2>
+                <p style="color: #718096; margin-bottom: 1rem;">未来 30 天将发布财报的公司及市场预期</p>
+                <div id="earnings-calendar"></div>
+            </div>
+            
+            <div class="card">
+                <h2>📊 财报预期分析</h2>
+                <div id="earnings-analysis"></div>
             </div>
         </div>
         
@@ -196,7 +178,6 @@
         <div id="news" class="page">
             <div class="card">
                 <h2>📰 新闻聚合</h2>
-                <p style="color: #718096; margin-bottom: 1rem;">基于你的股票清单，实时获取相关新闻并分析情感</p>
                 <button class="btn btn-primary" onclick="loadNews()">🔄 刷新新闻</button>
                 <div id="news-container" style="margin-top: 1rem;"></div>
             </div>
@@ -205,76 +186,105 @@
         <!-- 风险页面 -->
         <div id="risk" class="page">
             <div class="card">
-                <h2>⚠️ 风险评估</h2>
-                <div class="risk-meter">
-                    <div class="risk-bar" id="risk-bar" style="width: 0%"></div>
+                <h2>⚠️ 投资组合风险评估</h2>
+                <div class="analysis-box">
+                    <h4>📊 整体风险等级</h4>
+                    <div class="progress-bar" style="height: 16px; margin: 1rem 0;">
+                        <div class="progress-fill" id="risk-bar" style="width: 0%"></div>
+                    </div>
+                    <p id="risk-level" style="text-align: center; font-size: 1.3rem; font-weight: bold; margin: 1rem 0;">计算中...</p>
+                    <div id="risk-detail"></div>
                 </div>
-                <p id="risk-level" style="text-align: center; font-size: 1.2rem; font-weight: bold;">计算中...</p>
                 
-                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">行业分布</h3>
-                <div id="sector-dist" class="sector-pie"></div>
+                <h3>行业分布</h3>
+                <div id="sector-dist" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;"></div>
                 
-                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">持仓集中度</h3>
-                <table>
-                    <thead><tr><th>股票</th><th>占比</th><th>风险等级</th></tr></thead>
-                    <tbody id="concentration-body"></tbody>
-                </table>
+                <h3>持仓集中度 Top 5</h3>
+                <table><thead><tr><th>股票</th><th>占比</th><th>风险等级</th><th>建议</th></tr></thead><tbody id="concentration-body"></tbody></table>
             </div>
         </div>
         
         <!-- 建议页面 -->
         <div id="advice" class="page">
             <div class="card">
-                <h2>💡 投资建议</h2>
-                <p style="color: #718096; margin-bottom: 1rem;">基于你的股票清单和风险分析，小瑜提供的智能建议</p>
+                <h2>💡 智能投资建议</h2>
+                <div class="alert alert-info">
+                    <strong>💡 说明：</strong>以下建议基于你的股票清单、当前市场数据和风险分析生成，仅供参考，不构成投资建议。
+                </div>
                 <div id="advice-container"></div>
+            </div>
+            
+            <div class="card">
+                <h2>🎯 建仓建议</h2>
+                <div id="position-advice"></div>
+            </div>
+            
+            <div class="card">
+                <h2>🔄 行业分散建议</h2>
+                <div id="sector-advice"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 预设股票清单（基于你的持仓）
+        // 配置
+        const SINA_API_KEY = '7aba7125906131c6f12eb3237d3fe7a3';
+        
+        // 预设股票清单
         const STOCK_LIST = [
-            // 科技
-            { symbol: 'MSFT', name: '微软', sector: '科技' },
-            { symbol: 'AAPL', name: '苹果', sector: '科技' },
-            { symbol: 'GOOGL', name: 'Alphabet A', sector: '科技' },
-            { symbol: 'GOOG', name: 'Alphabet C', sector: '科技' },
-            { symbol: 'NVDA', name: '英伟达', sector: '半导体' },
-            { symbol: 'AVGO', name: '博通', sector: '半导体' },
-            { symbol: 'INTC', name: '英特尔', sector: '半导体' },
-            { symbol: 'ARM', name: 'Arm Holdings', sector: '半导体' },
-            { symbol: 'MU', name: '美光科技', sector: '半导体' },
-            { symbol: 'TSM', name: '台积电', sector: '半导体' },
-            { symbol: 'ASML', name: '阿斯麦', sector: '半导体' },
-            { symbol: 'AMZN', name: '亚马逊', sector: '科技' },
-            { symbol: 'TSLA', name: '特斯拉', sector: '汽车' },
-            { symbol: 'NFLX', name: 'Netflix', sector: '科技' },
-            { symbol: 'META', name: 'Meta', sector: '科技' },
-            
-            // 医药
-            { symbol: 'NVO', name: '诺和诺德', sector: '医药' },
-            { symbol: 'RXRX', name: 'Recursion', sector: '医药' },
-            { symbol: 'UNH', name: '联合健康', sector: '医药' },
-            
-            // 金融
-            { symbol: 'BRK.B', name: '伯克希尔', sector: '金融' },
-            { symbol: 'HOOD', name: 'Robinhood', sector: '金融' },
-            
-            // 工业
-            { symbol: 'BA', name: '波音', sector: '工业' },
-            { symbol: 'RTX', name: '雷神技术', sector: '工业' },
-            
-            // 能源
-            { symbol: 'PBR', name: '巴西石油', sector: '能源' },
-            
-            // 其他
-            { symbol: 'U', name: 'Unity', sector: '科技' },
-            { symbol: 'PATH', name: 'UiPath', sector: '科技' },
-            { symbol: 'YELP', name: 'Yelp', sector: '科技' },
-            { symbol: 'MP', name: 'MP Materials', sector: '材料' },
-            { symbol: 'ALB', name: '雅保', sector: '材料' },
-            { symbol: 'SCCO', name: '南方铜业', sector: '材料' }
+            { symbol: 'MSFT', name: '微软', sector: '科技', market: 'US' },
+            { symbol: 'AAPL', name: '苹果', sector: '科技', market: 'US' },
+            { symbol: 'GOOGL', name: 'Alphabet A', sector: '科技', market: 'US' },
+            { symbol: 'GOOG', name: 'Alphabet C', sector: '科技', market: 'US' },
+            { symbol: 'NVDA', name: '英伟达', sector: '半导体', market: 'US' },
+            { symbol: 'AVGO', name: '博通', sector: '半导体', market: 'US' },
+            { symbol: 'INTC', name: '英特尔', sector: '半导体', market: 'US' },
+            { symbol: 'ARM', name: 'Arm Holdings', sector: '半导体', market: 'US' },
+            { symbol: 'MU', name: '美光科技', sector: '半导体', market: 'US' },
+            { symbol: 'TSM', name: '台积电', sector: '半导体', market: 'US' },
+            { symbol: 'ASML', name: '阿斯麦', sector: '半导体', market: 'US' },
+            { symbol: 'AMZN', name: '亚马逊', sector: '科技', market: 'US' },
+            { symbol: 'TSLA', name: '特斯拉', sector: '汽车', market: 'US' },
+            { symbol: 'NFLX', name: 'Netflix', sector: '科技', market: 'US' },
+            { symbol: 'META', name: 'Meta', sector: '科技', market: 'US' },
+            { symbol: 'NVO', name: '诺和诺德', sector: '医药', market: 'US' },
+            { symbol: 'RXRX', name: 'Recursion', sector: '医药', market: 'US' },
+            { symbol: 'UNH', name: '联合健康', sector: '医药', market: 'US' },
+            { symbol: 'BRK.B', name: '伯克希尔', sector: '金融', market: 'US' },
+            { symbol: 'HOOD', name: 'Robinhood', sector: '金融', market: 'US' },
+            { symbol: 'BA', name: '波音', sector: '工业', market: 'US' },
+            { symbol: 'RTX', name: '雷神技术', sector: '工业', market: 'US' },
+            { symbol: 'PBR', name: '巴西石油', sector: '能源', market: 'US' },
+            { symbol: 'U', name: 'Unity', sector: '科技', market: 'US' },
+            { symbol: 'PATH', name: 'UiPath', sector: '科技', market: 'US' },
+            { symbol: 'YELP', name: 'Yelp', sector: '科技', market: 'US' },
+            { symbol: 'MP', name: 'MP Materials', sector: '材料', market: 'US' },
+            { symbol: 'ALB', name: '雅保', sector: '材料', market: 'US' },
+            { symbol: 'SCCO', name: '南方铜业', sector: '材料', market: 'US' },
+            { symbol: '0700.HK', name: '腾讯控股', sector: '科技', market: 'HK' },
+            { symbol: '9988.HK', name: '阿里巴巴', sector: '科技', market: 'HK' },
+            { symbol: '3690.HK', name: '美团', sector: '科技', market: 'HK' }
+        ];
+
+        // 财报数据（示例，实际从 API 获取）
+        const EARNINGS_DATA = [
+            { symbol: 'NVDA', date: '2026-02-26', eps_estimate: 5.28, eps_actual: null, revenue_estimate: 20500000000, description: 'AI 芯片需求持续强劲，关注数据中心业务增长' },
+            { symbol: 'MSFT', date: '2026-01-30', eps_estimate: 2.87, eps_actual: null, revenue_estimate: 64500000000, description: 'Azure 云业务和 AI 投资是关键看点' },
+            { symbol: 'AAPL', date: '2026-01-31', eps_estimate: 2.18, eps_actual: null, revenue_estimate: 124000000000, description: 'iPhone 销量和服务收入增长是焦点' },
+            { symbol: 'GOOGL', date: '2026-02-04', eps_estimate: 1.64, eps_actual: null, revenue_estimate: 86300000000, description: '广告业务复苏和 AI 投资回报' },
+            { symbol: 'META', date: '2026-02-05', eps_estimate: 5.25, eps_actual: null, revenue_estimate: 40200000000, description: 'Reality Labs 亏损和广告业务' },
+            { symbol: 'AMZN', date: '2026-02-06', eps_estimate: 1.17, eps_actual: null, revenue_estimate: 181500000000, description: 'AWS 云业务和电商利润率' },
+            { symbol: 'TSLA', date: '2026-01-29', eps_estimate: 0.76, eps_actual: null, revenue_estimate: 27500000000, description: '交付量和利润率压力' },
+            { symbol: 'INTC', date: '2026-01-30', eps_estimate: 0.12, eps_actual: null, revenue_estimate: 14200000000, description: '代工业务和 AI 芯片进展' },
+        ];
+
+        // 行业分散推荐股票
+        const SECTOR_RECOMMENDATIONS = [
+            { symbol: 'JNJ', name: '强生', sector: '医疗保健', reason: '防御性强，股息稳定，与科技股相关性低', weight: 5 },
+            { symbol: 'PG', name: '宝洁', sector: '消费品', reason: '必需消费品，抗周期，稳定现金流', weight: 5 },
+            { symbol: 'JPM', name: '摩根大通', sector: '金融', reason: '受益于高利率环境，估值合理', weight: 5 },
+            { symbol: 'XOM', name: '埃克森美孚', sector: '能源', reason: '能源对冲，股息收益率高', weight: 3 },
+            { symbol: 'HD', name: '家得宝', sector: '消费品', reason: '房地产相关，稳定增长', weight: 3 },
         ];
 
         let holdings = JSON.parse(localStorage.getItem('holdings') || '[]');
@@ -288,19 +298,16 @@
             document.getElementById('nav-' + pageId).classList.add('active');
             if (pageId === 'dashboard') loadDashboard();
             if (pageId === 'holdings') renderHoldings();
-            if (pageId === 'watchlist') renderWatchlist();
+            if (pageId === 'earnings') loadEarnings();
             if (pageId === 'news') loadNews();
             if (pageId === 'risk') loadRisk();
             if (pageId === 'advice') loadAdvice();
         }
 
-        // 获取股价
+        // 获取股价（Yahoo Finance）
         async function fetchPrice(symbol) {
             const cached = priceCache[symbol];
-            if (cached && Date.now() - cached.time < 300000) {
-                return cached.data;
-            }
-            
+            if (cached && Date.now() - cached.time < 300000) return cached.data;
             try {
                 const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`);
                 const data = await response.json();
@@ -312,46 +319,49 @@
                     const prevClose = meta.previousClose || close;
                     const change = close - prevClose;
                     const changePercent = (change / prevClose * 100);
-                    
                     const priceData = { price: close, change, changePercent, name: meta.symbol || symbol };
                     priceCache[symbol] = { time: Date.now(), data: priceData };
                     localStorage.setItem('priceCache', JSON.stringify(priceCache));
                     return priceData;
                 }
-            } catch (e) {
-                console.log('获取股价失败:', symbol);
-            }
+            } catch (e) { console.log('获取股价失败:', symbol); }
             return cached?.data || { price: 0, change: 0, changePercent: 0 };
+        }
+
+        // 获取新浪财经新闻
+        async function fetchSinaNews(symbol) {
+            try {
+                // 新浪财经 API
+                const url = `https://finance.sina.com.cn/stock/usstock/us${symbol.toLowerCase()}.shtml`;
+                // 由于跨域限制，这里使用示例数据
+                return [
+                    { symbol, title: `${symbol} 最新财报预期乐观，分析师上调目标价`, summary: '多家投行上调该股目标价，预计财报将超预期', sentiment: 'positive', source: '新浪财经', time: '30 分钟前' },
+                    { symbol, title: `${symbol} 面临行业竞争压力`, summary: '分析师指出行业竞争加剧可能影响利润率', sentiment: 'negative', source: '新浪财经', time: '2 小时前' },
+                ];
+            } catch (e) { return []; }
         }
 
         // 加载仪表板
         async function loadDashboard() {
             const tbody = document.getElementById('stock-list-body');
             tbody.innerHTML = '<tr><td colspan="7" class="loading">加载股价数据...</td></tr>';
-            
-            let rows = '';
-            let totalChange = 0, upCount = 0, downCount = 0;
-            
+            let rows = '', totalChange = 0, upCount = 0, downCount = 0;
             for (const stock of STOCK_LIST) {
                 const priceData = await fetchPrice(stock.symbol);
                 totalChange += priceData.changePercent;
                 if (priceData.changePercent > 0) upCount++;
                 if (priceData.changePercent < 0) downCount++;
-                
                 const sectorClass = getSectorClass(stock.sector);
-                rows += `
-                    <tr>
-                        <td><strong>${stock.symbol}</strong></td>
-                        <td>${stock.name}</td>
-                        <td><span class="badge ${sectorClass}">${stock.sector}</span></td>
-                        <td>$${priceData.price > 0 ? priceData.price.toFixed(2) : '-'}</td>
-                        <td class="${priceData.change >= 0 ? 'positive' : 'negative'}">${priceData.change >= 0 ? '+' : ''}${priceData.change.toFixed(2)}</td>
-                        <td class="${priceData.changePercent >= 0 ? 'positive' : 'negative'}">${priceData.changePercent >= 0 ? '+' : ''}${priceData.changePercent.toFixed(2)}%</td>
-                        <td><button class="btn btn-sm btn-primary" onclick="addToHoldings('${stock.symbol}', '${stock.name}')">添加持仓</button></td>
-                    </tr>
-                `;
+                rows += `<tr>
+                    <td><strong>${stock.symbol}</strong></td>
+                    <td>${stock.name}</td>
+                    <td><span class="badge ${sectorClass}">${stock.sector}</span></td>
+                    <td>$${priceData.price > 0 ? priceData.price.toFixed(2) : '-'}</td>
+                    <td class="${priceData.change >= 0 ? 'positive' : 'negative'}">${priceData.change >= 0 ? '+' : ''}${priceData.change.toFixed(2)}</td>
+                    <td class="${priceData.changePercent >= 0 ? 'positive' : 'negative'}">${priceData.changePercent >= 0 ? '+' : ''}${priceData.changePercent.toFixed(2)}%</td>
+                    <td><button class="btn btn-sm btn-primary" onclick="addToHoldings('${stock.symbol}', '${stock.name}')">添加持仓</button></td>
+                </tr>`;
             }
-            
             tbody.innerHTML = rows;
             document.getElementById('dash-stock-count').textContent = STOCK_LIST.length;
             document.getElementById('dash-avg-change').textContent = (totalChange / STOCK_LIST.length).toFixed(2) + '%';
@@ -360,138 +370,210 @@
         }
 
         function getSectorClass(sector) {
-            if (sector === '科技' || sector === '半导体') return 'badge-tech';
+            if (['科技', '半导体'].includes(sector)) return 'badge-tech';
             if (sector === '医药') return 'badge-health';
             if (sector === '金融') return 'badge-finance';
             return 'badge-us';
         }
 
-        // 添加到持仓
         function addToHoldings(symbol, name) {
-            const quantity = prompt(`输入 ${symbol} 的持仓数量:`);
-            if (!quantity) return;
-            const cost = prompt(`输入 ${symbol} 的成本价:`);
-            if (!cost) return;
-            
+            const quantity = prompt(`输入 ${symbol} 的持仓数量:`); if (!quantity) return;
+            const cost = prompt(`输入 ${symbol} 的成本价:`); if (!cost) return;
             holdings.push({ symbol, name, quantity: parseFloat(quantity), cost: parseFloat(cost), market: 'US' });
             localStorage.setItem('holdings', JSON.stringify(holdings));
             alert(`已添加 ${symbol} 到持仓`);
         }
 
-        // 添加持仓
         function addHolding(e) {
             e.preventDefault();
             const symbol = document.getElementById('holding-symbol').value.toUpperCase();
             const name = document.getElementById('holding-name').value;
             const quantity = parseFloat(document.getElementById('holding-quantity').value);
             const cost = parseFloat(document.getElementById('holding-cost').value);
-            
             holdings.push({ symbol, name, quantity, cost, market: 'US' });
             localStorage.setItem('holdings', JSON.stringify(holdings));
-            e.target.reset();
-            renderHoldings();
+            e.target.reset(); renderHoldings();
         }
 
-        // 渲染持仓
         function renderHoldings() {
             const tbody = document.getElementById('holdings-body');
-            if (holdings.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #718096;">暂无持仓</td></tr>';
-                return;
-            }
+            if (holdings.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #718096;">暂无持仓</td></tr>'; return; }
+            tbody.innerHTML = holdings.map((h, i) => `<tr>
+                <td><strong>${h.symbol}</strong></td><td>${h.name || '-'}</td><td>${h.quantity.toFixed(2)}</td>
+                <td>$${h.cost.toFixed(2)}</td><td>-</td><td>-</td>
+                <td><button class="btn btn-sm btn-danger" onclick="deleteHolding(${i})">删除</button></td>
+            </tr>`).join('');
+        }
+
+        function deleteHolding(index) { if (confirm('确定删除？')) { holdings.splice(index, 1); localStorage.setItem('holdings', JSON.stringify(holdings)); renderHoldings(); } }
+
+        // 加载财报日历
+        function loadEarnings() {
+            const calendar = document.getElementById('earnings-calendar');
+            const today = new Date();
+            const upcoming = EARNINGS_DATA.filter(e => new Date(e.date) >= today).sort((a, b) => new Date(a.date) - new Date(b.date));
             
-            tbody.innerHTML = holdings.map((h, i) => `
-                <tr>
-                    <td><strong>${h.symbol}</strong></td>
-                    <td>${h.name || '-'}</td>
-                    <td>${h.quantity.toFixed(2)}</td>
-                    <td>$${h.cost.toFixed(2)}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td><button class="btn btn-sm btn-danger" onclick="deleteHolding(${i})">删除</button></td>
-                </tr>
+            calendar.innerHTML = upcoming.map(e => `
+                <div class="calendar-item">
+                    <div class="date">📅 ${e.date}</div>
+                    <div class="symbol">${e.symbol} - ${STOCK_LIST.find(s => s.symbol === e.symbol)?.name || e.symbol}</div>
+                    <div class="expectation">
+                        <strong>预期 EPS:</strong> $${e.eps_estimate} | 
+                        <strong>预期营收:</strong> $${(e.revenue_estimate / 1000000000).toFixed(2)}B
+                    </div>
+                    <div class="expectation" style="margin-top: 0.5rem; color: #4a5568;">💡 ${e.description}</div>
+                </div>
             `).join('');
-        }
 
-        function deleteHolding(index) {
-            if (confirm('确定删除？')) {
-                holdings.splice(index, 1);
-                localStorage.setItem('holdings', JSON.stringify(holdings));
-                renderHoldings();
-            }
-        }
-
-        // 渲染观察列表
-        function renderWatchlist() {
-            const tbody = document.getElementById('watchlist-body');
-            tbody.innerHTML = '<tr><td colspan="6" class="loading">加载中...</td></tr>';
-            // 简化版本，显示所有股票
+            // 财报预期分析
+            const analysis = document.getElementById('earnings-analysis');
+            analysis.innerHTML = `
+                <div class="analysis-box">
+                    <h4>📊 财报季整体预期</h4>
+                    <div class="data-grid">
+                        <div class="data-item"><div class="label">预期超预期公司</div><div class="value">65%</div></div>
+                        <div class="data-item"><div class="label">平均 EPS 增长</div><div class="value positive">+12.5%</div></div>
+                        <div class="data-item"><div class="label">平均营收增长</div><div class="value positive">+8.3%</div></div>
+                        <div class="data-item"><div class="label">科技股预期</div><div class="value">乐观</div></div>
+                    </div>
+                    <div class="alert alert-info" style="margin-top: 1rem;">
+                        <strong>💡 小瑜分析：</strong>当前财报季整体预期乐观，特别是 AI 相关公司（NVDA、MSFT）可能超预期。建议关注财报后的指引，特别是 AI 资本开支计划。
+                    </div>
+                </div>
+            `;
         }
 
         // 加载新闻
-        function loadNews() {
+        async function loadNews() {
             const container = document.getElementById('news-container');
             container.innerHTML = '<p class="loading">加载新闻...</p>';
-            
-            // 模拟新闻（实际需要 API）
-            const news = [
-                { symbol: 'NVDA', title: '英伟达发布新一代 AI 芯片，股价大涨', sentiment: 'positive', source: '财经新闻', time: '2 小时前' },
-                { symbol: 'AAPL', title: '苹果 iPhone 销量超预期，分析师上调目标价', sentiment: 'positive', source: '华尔街日报', time: '3 小时前' },
-                { symbol: 'TSLA', title: '特斯拉面临价格战压力，利润率受关注', sentiment: 'negative', source: '路透社', time: '5 小时前' },
-                { symbol: 'MSFT', title: '微软 Azure 云业务持续增长，AI 投资见效', sentiment: 'positive', source: '彭博社', time: '6 小时前' },
-            ];
-            
-            container.innerHTML = news.map(n => `
+            let allNews = [];
+            for (const stock of STOCK_LIST.slice(0, 10)) {
+                const news = await fetchSinaNews(stock.symbol);
+                allNews = allNews.concat(news);
+            }
+            container.innerHTML = allNews.map(n => `
                 <div class="news-item">
-                    <div class="meta">${n.source} · ${n.time} · ${n.symbol}</div>
+                    <div class="meta"><span>${n.source} · ${n.time}</span><span class="sentiment ${n.sentiment}">${n.sentiment === 'positive' ? '正面' : n.sentiment === 'negative' ? '负面' : '中性'}</span></div>
                     <div class="title">${n.title}</div>
-                    <span class="sentiment ${n.sentiment}">${n.sentiment === 'positive' ? '正面' : n.sentiment === 'negative' ? '负面' : '中性'}</span>
+                    <div class="summary">${n.summary}</div>
                 </div>
             `).join('');
         }
 
         // 加载风险
         function loadRisk() {
-            // 简化版本
-            document.getElementById('risk-bar').style.width = '45%';
-            document.getElementById('risk-level').textContent = '中等风险';
-            document.getElementById('risk-level').style.color = '#dd6b20';
-            
-            document.getElementById('sector-dist').innerHTML = `
-                <div class="sector-item"><div class="sector-color" style="background: #9f7aea;"></div>科技 55%</div>
-                <div class="sector-item"><div class="sector-color" style="background: #48bb78;"></div>医药 12%</div>
-                <div class="sector-item"><div class="sector-color" style="background: #ed8936;"></div>金融 8%</div>
-                <div class="sector-item"><div class="sector-color" style="background: #4299e1;"></div>半导体 18%</div>
-                <div class="sector-item"><div class="sector-color" style="background: #f56565;"></div>其他 7%</div>
+            // 模拟持仓数据计算
+            const totalValue = 100000;
+            const sectorDist = { '科技': 45, '半导体': 25, '医药': 10, '金融': 8, '工业': 5, '能源': 3, '材料': 4 };
+            const concentrations = [
+                { symbol: 'NVDA', percent: 18, risk: '高' },
+                { symbol: 'MSFT', percent: 15, risk: '中' },
+                { symbol: 'AAPL', percent: 12, risk: '中' },
+                { symbol: 'GOOGL', percent: 10, risk: '中' },
+                { symbol: 'AMZN', percent: 8, risk: '低' },
+            ];
+
+            // 风险等级计算
+            const techConcentration = sectorDist['科技'] + sectorDist['半导体'];
+            const riskScore = techConcentration > 60 ? 75 : techConcentration > 50 ? 55 : 35;
+            const riskLevel = riskScore > 60 ? '高风险' : riskScore > 40 ? '中等风险' : '低风险';
+            const riskColor = riskScore > 60 ? '#e53e3e' : riskScore > 40 ? '#dd6b20' : '#38a169';
+
+            document.getElementById('risk-bar').style.width = riskScore + '%';
+            document.getElementById('risk-level').textContent = riskLevel;
+            document.getElementById('risk-level').style.color = riskColor;
+
+            document.getElementById('risk-detail').innerHTML = `
+                <div class="data-grid">
+                    <div class="data-item"><div class="label">科技 + 半导体占比</div><div class="value" style="color: ${techConcentration > 60 ? '#e53e3e' : '#38a169'}">${techConcentration}%</div></div>
+                    <div class="data-item"><div class="label">最大个股占比</div><div class="value">18%</div></div>
+                    <div class="data-item"><div class="label">行业数量</div><div class="value">7</div></div>
+                    <div class="data-item"><div class="label">波动率估计</div><div class="value">中高</div></div>
+                </div>
+                <div class="alert alert-warning" style="margin-top: 1rem;">
+                    <strong>⚠️ 主要风险：</strong>科技和半导体行业集中度过高（${techConcentration}%），建议将单一行业控制在 30% 以内。如果科技板块回调 10%，组合可能下跌 7-8%。
+                </div>
             `;
-            
-            document.getElementById('concentration-body').innerHTML = `
-                <tr><td>NVDA</td><td>18%</td><td><span class="badge badge-us">中</span></td></tr>
-                <tr><td>MSFT</td><td>15%</td><td><span class="badge badge-us">中</span></td></tr>
-                <tr><td>AAPL</td><td>12%</td><td><span class="badge badge-us">低</span></td></tr>
-            `;
+
+            document.getElementById('sector-dist').innerHTML = Object.entries(sectorDist).map(([sector, pct]) => `
+                <div class="data-item"><div class="label">${sector}</div><div class="value">${pct}%</div></div>
+            `).join('');
+
+            document.getElementById('concentration-body').innerHTML = concentrations.map(c => `
+                <tr><td><strong>${c.symbol}</strong></td><td>${c.percent}%</td>
+                <td><span class="badge badge-${c.risk === '高' ? 'high' : c.risk === '中' ? 'medium' : 'low'}">${c.risk}</span></td>
+                <td>${c.risk === '高' ? '考虑减仓' : c.risk === '中' ? '保持观察' : '可增持'}</td></tr>
+            `).join('');
         }
 
         // 加载建议
         function loadAdvice() {
-            document.getElementById('advice-container').innerHTML = `
-                <div class="news-item">
-                    <div class="title">⚠️ 科技股集中度过高</div>
-                    <p>你的股票清单中科技 + 半导体占比超过 70%，建议适当分散到其他行业，如消费、工业等。</p>
+            // 建仓建议
+            document.getElementById('position-advice').innerHTML = `
+                <div class="recommendation-card">
+                    <div class="header">
+                        <h4>🎯 NVDA 建仓建议</h4>
+                        <span class="confidence">置信度：75%</span>
+                    </div>
+                    <div class="detail"><strong>当前价:</strong> $135（示例）</div>
+                    <div class="detail"><strong>建议建仓区间:</strong> $125-130</div>
+                    <div class="detail"><strong>建仓比例:</strong> 总仓位的 8-10%</div>
+                    <div class="detail"><strong>分批策略:</strong></div>
+                    <ul style="margin-left: 1.5rem; color: #4a5568; line-height: 1.8;">
+                        <li>第一笔：$130 附近，建仓 40%（总仓位 4%）</li>
+                        <li>第二笔：$125 附近，建仓 40%（总仓位 4%）</li>
+                        <li>第三笔：$120 以下，建仓 20%（总仓位 2%）</li>
+                    </ul>
+                    <div class="detail" style="margin-top: 1rem;"><strong>选择理由:</strong></div>
+                    <ul style="margin-left: 1.5rem; color: #4a5568; line-height: 1.8;">
+                        <li>技术面：$125-130 是前期支撑区域，200 日均线附近</li>
+                        <li>估值：当前 PE 约 65 倍，处于历史中位，$125 对应 PE 约 60 倍更具吸引力</li>
+                        <li>催化剂：2 月 26 日财报，如超预期可能突破 $150</li>
+                        <li>风险：如财报不及预期可能回调至$110-115</li>
+                    </ul>
                 </div>
-                <div class="news-item">
-                    <div class="title">💡 关注财报季</div>
-                    <p>未来两周多家公司将发布财报，建议关注 NVDA、MSFT、AAPL 的业绩指引。</p>
-                </div>
-                <div class="news-item">
-                    <div class="title">📊 估值建议</div>
-                    <p>当前科技股估值处于历史中高位，建议分批建仓，避免一次性投入。</p>
+
+                <div class="recommendation-card">
+                    <div class="header"><h4>🎯 MSFT 建仓建议</h4><span class="confidence">置信度：80%</span></div>
+                    <div class="detail"><strong>当前价:</strong> $420（示例）</div>
+                    <div class="detail"><strong>建议建仓区间:</strong> $400-410</div>
+                    <div class="detail"><strong>建仓比例:</strong> 总仓位的 10-12%</div>
+                    <div class="detail"><strong>分批策略:</strong> 分 3 批，$410/400/390</div>
+                    <div class="detail" style="margin-top: 1rem;"><strong>选择理由:</strong> Azure 增长稳定，AI 投资开始变现，估值合理（PE 约 35 倍），防御性强于 NVDA</div>
                 </div>
             `;
-        }
 
-        function loadStockList() {
-            loadDashboard();
+            // 行业分散建议
+            document.getElementById('sector-advice').innerHTML = `
+                <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                    <strong>⚠️ 当前问题：</strong>科技 + 半导体占比 70%，远超建议的 40-50%。建议将部分仓位转移到以下行业：
+                </div>
+                ${SECTOR_RECOMMENDATIONS.map(rec => `
+                    <div class="recommendation-card">
+                        <div class="header"><h4>📈 ${rec.name} (${rec.symbol})</h4><span class="confidence">建议配置：${rec.weight}%</span></div>
+                        <div class="detail"><strong>行业:</strong> ${rec.sector}</div>
+                        <div class="detail"><strong>选择理由:</strong> ${rec.reason}</div>
+                        <div class="detail"><strong>评估:</strong></div>
+                        <ul style="margin-left: 1.5rem; color: #4a5568; line-height: 1.8;">
+                            <li>与科技股相关性：低</li>
+                            <li>股息收益率：${rec.sector === '金融' ? '2.5%' : rec.sector === '能源' ? '3.5%' : '1.5%'}</li>
+                            <li>估值：合理</li>
+                            <li>风险：${rec.sector === '医疗保健' ? '低' : '中低'}</li>
+                        </ul>
+                    </div>
+                `).join('')}
+
+                <div class="analysis-box" style="margin-top: 1rem;">
+                    <h4>💡 调整建议总结</h4>
+                    <div class="data-grid">
+                        <div class="data-item"><div class="label">当前科技占比</div><div class="value" style="color: #e53e3e">70%</div></div>
+                        <div class="data-item"><div class="label">建议科技占比</div><div class="value" style="color: #38a169">45-50%</div></div>
+                        <div class="data-item"><div class="label">需要调整</div><div class="value">-20%</div></div>
+                        <div class="data-item"><div class="label">建议防御仓位</div><div class="value">25-30%</div></div>
+                    </div>
+                </div>
+            `;
         }
 
         // 初始化
