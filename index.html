@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💼 投资追踪 - 小瑜为惜知打造</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f7fa; color: #333; }
+        
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar h1 { color: white; font-size: 1.5rem; }
+        .navbar nav { display: flex; gap: 1.5rem; }
+        .navbar nav a { color: white; text-decoration: none; opacity: 0.9; transition: opacity 0.3s; padding: 0.5rem 0; }
+        .navbar nav a:hover, .navbar nav a.active { opacity: 1; border-bottom: 2px solid white; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        
+        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { margin-bottom: 1rem; color: #4a5568; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-card .label { color: #718096; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 1.8rem; font-weight: bold; color: #2d3748; }
+        .stat-card .value.positive { color: #38a169; }
+        .stat-card .value.negative { color: #e53e3e; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; color: #4a5568; font-weight: 600; }
+        tr:hover { background: #f7fafc; }
+        
+        .positive { color: #38a169; }
+        .negative { color: #e53e3e; }
+        
+        .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; cursor: pointer; border: none; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-danger { background: #e53e3e; color: white; }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: #4a5568; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+        
+        .flash { padding: 1rem; border-radius: 6px; margin-bottom: 1rem; display: none; }
+        .flash.show { display: block; }
+        .flash.success { background: #c6f6d5; color: #22543d; }
+        .flash.error { background: #fed7d7; color: #742a2a; }
+        
+        .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        .badge-us { background: #bee3f8; color: #2c5282; }
+        .badge-hk { background: #fef3c7; color: #92400e; }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end; }
+        
+        footer { text-align: center; padding: 2rem; color: #718096; font-size: 0.9rem; }
+        
+        .hint { background: #f0f4ff; padding: 1rem; border-radius: 8px; border-left: 4px solid #667eea; margin-top: 1rem; }
+        .hint p { color: #4a5568; line-height: 1.8; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📊 投资追踪</h1>
+        <nav>
+            <a href="#" onclick="showPage('dashboard')" class="active" id="nav-dashboard">仪表板</a>
+            <a href="#" onclick="showPage('holdings')" id="nav-holdings">持仓</a>
+            <a href="#" onclick="showPage('transactions')" id="nav-transactions">交易记录</a>
+            <a href="#" onclick="showPage('watchlist')" id="nav-watchlist">观察列表</a>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <div id="flash" class="flash"></div>
+        
+        <!-- 仪表板页面 -->
+        <div id="dashboard" class="page active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">总资产</div>
+                    <div class="value" id="dash-total-value">¥0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">总成本</div>
+                    <div class="value" id="dash-total-cost">¥0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">总盈亏</div>
+                    <div class="value" id="dash-total-gain">¥0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">收益率</div>
+                    <div class="value" id="dash-total-percent">0.00%</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📈 持仓概览</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>代码</th>
+                            <th>名称</th>
+                            <th>持仓</th>
+                            <th>成本价</th>
+                            <th>现价</th>
+                            <th>市值</th>
+                            <th>盈亏</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboard-holdings"></tbody>
+                </table>
+                <div id="no-holdings-hint" class="hint" style="display:none;">
+                    <p>暂无持仓，<a href="#" onclick="showPage('holdings')" style="color: #667eea;">添加第一笔持仓</a></p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>💡 小瑜提示</h2>
+                <ul style="padding-left: 1.5rem; color: #4a5568; line-height: 1.8;">
+                    <li>数据保存在你的浏览器本地，安全私密</li>
+                    <li>在「持仓」页面添加你持有的股票</li>
+                    <li>在「交易记录」页面记录每笔买卖</li>
+                    <li>点击「刷新股价」获取最新市场数据</li>
+                    <li>清空浏览器缓存会删除数据，请定期备份</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 持仓页面 -->
+        <div id="holdings" class="page">
+            <div class="card">
+                <h2>➕ 添加持仓</h2>
+                <form onsubmit="addHolding(event)" class="form-row">
+                    <div class="form-group">
+                        <label>股票代码 *</label>
+                        <input type="text" id="holding-symbol" placeholder="如：AAPL, 0700.HK" required>
+                    </div>
+                    <div class="form-group">
+                        <label>股票名称</label>
+                        <input type="text" id="holding-name" placeholder="如：苹果公司">
+                    </div>
+                    <div class="form-group">
+                        <label>持仓数量 *</label>
+                        <input type="number" id="holding-quantity" step="0.01" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>成本价 *</label>
+                        <input type="number" id="holding-cost" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>市场</label>
+                        <select id="holding-market">
+                            <option value="US">美股</option>
+                            <option value="HK">港股</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">添加持仓</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>📋 持仓列表</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>代码</th>
+                            <th>名称</th>
+                            <th>市场</th>
+                            <th>数量</th>
+                            <th>成本价</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="holdings-list"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 交易记录页面 -->
+        <div id="transactions" class="page">
+            <div class="card">
+                <h2>📝 记录交易</h2>
+                <form onsubmit="addTransaction(event)" class="form-row">
+                    <div class="form-group">
+                        <label>股票代码 *</label>
+                        <input type="text" id="tx-symbol" placeholder="如：AAPL" required>
+                    </div>
+                    <div class="form-group">
+                        <label>交易类型 *</label>
+                        <select id="tx-type">
+                            <option value="BUY">买入</option>
+                            <option value="SELL">卖出</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>数量 *</label>
+                        <input type="number" id="tx-quantity" step="0.01" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>成交价 *</label>
+                        <input type="number" id="tx-price" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>手续费</label>
+                        <input type="number" id="tx-fee" step="0.01" placeholder="0.00" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>交易日期 *</label>
+                        <input type="date" id="tx-date" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">记录交易</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>📜 交易历史</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>代码</th>
+                            <th>类型</th>
+                            <th>数量</th>
+                            <th>价格</th>
+                            <th>总额</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-list"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 观察列表页面 -->
+        <div id="watchlist" class="page">
+            <div class="card">
+                <h2>➕ 添加观察股票</h2>
+                <form onsubmit="addWatchlist(event)" style="display: flex; gap: 1rem; max-width: 600px;">
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <input type="text" id="watch-symbol" placeholder="股票代码" required style="width: 100%;">
+                    </div>
+                    <button type="submit" class="btn btn-success">添加</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>👀 观察列表</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>代码</th>
+                            <th>现价</th>
+                            <th>涨跌</th>
+                            <th>涨跌幅</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="watchlist-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>投资追踪系统 v1.0 | 小瑜为惜知打造 💼 | 数据保存在本地浏览器</p>
+    </footer>
+
+    <script>
+        // 数据存储
+        let holdings = JSON.parse(localStorage.getItem('holdings') || '[]');
+        let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        let watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+        let priceCache = JSON.parse(localStorage.getItem('priceCache') || '{}');
+
+        // 页面切换
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.navbar nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('nav-' + pageId).classList.add('active');
+            renderAll();
+        }
+
+        // 显示提示
+        function showFlash(message, type) {
+            const flash = document.getElementById('flash');
+            flash.textContent = message;
+            flash.className = 'flash show ' + type;
+            setTimeout(() => flash.classList.remove('show'), 3000);
+        }
+
+        // 获取股价（模拟 + 真实 API）
+        async function fetchPrice(symbol) {
+            // 检查缓存（5 分钟内有效）
+            const cached = priceCache[symbol];
+            if (cached && Date.now() - cached.time < 300000) {
+                return cached.data;
+            }
+            
+            try {
+                // 尝试使用 Yahoo Finance 代理
+                const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
+                    headers: { 'User-Agent': 'Mozilla/5.0' }
+                });
+                const data = await response.json();
+                const result = data.chart?.result?.[0];
+                if (result) {
+                    const meta = result.meta;
+                    const quote = result.indicators?.quote?.[0] || {};
+                    const close = quote.close?.slice(-1)[0] || meta.regularMarketPrice;
+                    const prevClose = meta.previousClose || close;
+                    const change = close - prevClose;
+                    const changePercent = (change / prevClose * 100);
+                    
+                    const priceData = {
+                        price: close,
+                        change: change,
+                        changePercent: changePercent,
+                        name: meta.symbol || symbol
+                    };
+                    
+                    priceCache[symbol] = { time: Date.now(), data: priceData };
+                    localStorage.setItem('priceCache', JSON.stringify(priceCache));
+                    return priceData;
+                }
+            } catch (e) {
+                console.log('获取股价失败:', symbol, e);
+            }
+            
+            // 返回缓存或默认值
+            return cached?.data || { price: 0, change: 0, changePercent: 0, name: symbol };
+        }
+
+        // 添加持仓
+        function addHolding(e) {
+            e.preventDefault();
+            const symbol = document.getElementById('holding-symbol').value.toUpperCase();
+            const name = document.getElementById('holding-name').value;
+            const quantity = parseFloat(document.getElementById('holding-quantity').value);
+            const cost = parseFloat(document.getElementById('holding-cost').value);
+            const market = document.getElementById('holding-market').value;
+            
+            const existing = holdings.findIndex(h => h.symbol === symbol);
+            if (existing >= 0) {
+                holdings[existing] = { ...holdings[existing], quantity, cost, market, name, updatedAt: new Date().toISOString() };
+            } else {
+                holdings.push({ symbol, name, quantity, cost, market, createdAt: new Date().toISOString() });
+            }
+            
+            localStorage.setItem('holdings', JSON.stringify(holdings));
+            showFlash('已添加持仓 ' + symbol, 'success');
+            e.target.reset();
+            renderAll();
+        }
+
+        // 删除持仓
+        function deleteHolding(symbol) {
+            if (confirm('确定删除 ' + symbol + ' 吗？')) {
+                holdings = holdings.filter(h => h.symbol !== symbol);
+                localStorage.setItem('holdings', JSON.stringify(holdings));
+                renderAll();
+            }
+        }
+
+        // 添加交易
+        function addTransaction(e) {
+            e.preventDefault();
+            const symbol = document.getElementById('tx-symbol').value.toUpperCase();
+            const type = document.getElementById('tx-type').value;
+            const quantity = parseFloat(document.getElementById('tx-quantity').value);
+            const price = parseFloat(document.getElementById('tx-price').value);
+            const fee = parseFloat(document.getElementById('tx-fee').value) || 0;
+            const date = document.getElementById('tx-date').value;
+            
+            const total = type === 'BUY' ? quantity * price + fee : quantity * price - fee;
+            
+            transactions.unshift({ symbol, type, quantity, price, fee, total, date, createdAt: new Date().toISOString() });
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            // 更新持仓
+            if (type === 'BUY') {
+                const existing = holdings.findIndex(h => h.symbol === symbol);
+                if (existing >= 0) {
+                    const h = holdings[existing];
+                    const newQty = h.quantity + quantity;
+                    const newCost = ((h.cost * h.quantity) + (price * quantity) + fee) / newQty;
+                    holdings[existing] = { ...h, quantity: newQty, cost: newCost, updatedAt: new Date().toISOString() };
+                } else {
+                    holdings.push({ symbol, name: '', quantity, cost: price + fee/quantity, market: 'US', createdAt: new Date().toISOString() });
+                }
+            } else {
+                const existing = holdings.findIndex(h => h.symbol === symbol);
+                if (existing >= 0) {
+                    holdings[existing].quantity = Math.max(0, holdings[existing].quantity - quantity);
+                    holdings[existing].updatedAt = new Date().toISOString();
+                }
+            }
+            localStorage.setItem('holdings', JSON.stringify(holdings));
+            
+            showFlash('已记录交易 ' + type + ' ' + symbol, 'success');
+            e.target.reset();
+            document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+            renderAll();
+        }
+
+        // 添加观察
+        function addWatchlist(e) {
+            e.preventDefault();
+            const symbol = document.getElementById('watch-symbol').value.toUpperCase();
+            if (!watchlist.find(w => w.symbol === symbol)) {
+                watchlist.push({ symbol, addedAt: new Date().toISOString() });
+                localStorage.setItem('watchlist', JSON.stringify(watchlist));
+                showFlash('已添加 ' + symbol + ' 到观察列表', 'success');
+            }
+            document.getElementById('watch-symbol').value = '';
+            renderAll();
+        }
+
+        // 删除观察
+        function deleteWatchlist(symbol) {
+            watchlist = watchlist.filter(w => w.symbol !== symbol);
+            localStorage.setItem('watchlist', JSON.stringify(watchlist));
+            renderAll();
+        }
+
+        // 渲染所有数据
+        async function renderAll() {
+            // 仪表板
+            let totalValue = 0, totalCost = 0;
+            const dashBody = document.getElementById('dashboard-holdings');
+            dashBody.innerHTML = '';
+            
+            for (const h of holdings) {
+                if (h.quantity <= 0) continue;
+                const priceData = await fetchPrice(h.symbol);
+                const currentValue = priceData.price * h.quantity;
+                const costValue = h.cost * h.quantity;
+                const gain = currentValue - costValue;
+                const gainPercent = (gain / costValue * 100);
+                
+                totalValue += currentValue;
+                totalCost += costValue;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${h.symbol}</strong></td>
+                    <td>${priceData.name || h.name || '-'}</td>
+                    <td>${h.quantity.toFixed(2)}</td>
+                    <td>¥${h.cost.toFixed(2)}</td>
+                    <td>¥${priceData.price.toFixed(2)}</td>
+                    <td>¥${currentValue.toFixed(2)}</td>
+                    <td class="${gain >= 0 ? 'positive' : 'negative'}">
+                        ${gain >= 0 ? '+' : ''}¥${gain.toFixed(2)} (${gainPercent.toFixed(2)}%)
+                    </td>
+                    <td><button class="btn btn-sm btn-primary" onclick="showPage('holdings')">管理</button></td>
+                `;
+                dashBody.appendChild(tr);
+            }
+            
+            document.getElementById('dash-total-value').textContent = '¥' + totalValue.toFixed(2);
+            document.getElementById('dash-total-cost').textContent = '¥' + totalCost.toFixed(2);
+            const totalGain = totalValue - totalCost;
+            const totalPercent = totalCost > 0 ? (totalGain / totalCost * 100) : 0;
+            const gainEl = document.getElementById('dash-total-gain');
+            const percentEl = document.getElementById('dash-total-percent');
+            gainEl.textContent = (totalGain >= 0 ? '+' : '') + '¥' + totalGain.toFixed(2);
+            percentEl.textContent = (totalPercent >= 0 ? '+' : '') + totalPercent.toFixed(2) + '%';
+            gainEl.className = 'value ' + (totalGain >= 0 ? 'positive' : 'negative');
+            percentEl.className = 'value ' + (totalPercent >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('no-holdings-hint').style.display = holdings.length === 0 ? 'block' : 'none';
+            
+            // 持仓列表
+            const holdingsBody = document.getElementById('holdings-list');
+            holdingsBody.innerHTML = holdings.map(h => `
+                <tr>
+                    <td><strong>${h.symbol}</strong></td>
+                    <td>${h.name || '-'}</td>
+                    <td><span class="badge badge-${h.market.toLowerCase()}">${h.market}</span></td>
+                    <td>${h.quantity.toFixed(2)}</td>
+                    <td>¥${h.cost.toFixed(2)}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteHolding('${h.symbol}')">删除</button></td>
+                </tr>
+            `).join('');
+            
+            // 交易列表
+            const txBody = document.getElementById('transactions-list');
+            txBody.innerHTML = transactions.map(tx => `
+                <tr>
+                    <td>${tx.date}</td>
+                    <td><strong>${tx.symbol}</strong></td>
+                    <td><span style="color: ${tx.type === 'BUY' ? '#38a169' : '#e53e3e'}">${tx.type === 'BUY' ? '买入' : '卖出'}</span></td>
+                    <td>${tx.quantity.toFixed(2)}</td>
+                    <td>¥${tx.price.toFixed(2)}</td>
+                    <td>¥${tx.total.toFixed(2)}</td>
+                </tr>
+            `).join('');
+            
+            // 观察列表
+            const watchBody = document.getElementById('watchlist-list');
+            watchBody.innerHTML = '';
+            for (const w of watchlist) {
+                const priceData = await fetchPrice(w.symbol);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${w.symbol}</strong></td>
+                    <td>¥${priceData.price > 0 ? priceData.price.toFixed(2) : '-'}</td>
+                    <td class="${priceData.change >= 0 ? 'positive' : 'negative'}">
+                        ${priceData.change > 0 ? '+' : ''}${priceData.change.toFixed(2)}
+                    </td>
+                    <td class="${priceData.changePercent >= 0 ? 'positive' : 'negative'}">
+                        ${priceData.changePercent > 0 ? '+' : ''}${priceData.changePercent.toFixed(2)}%
+                    </td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteWatchlist('${w.symbol}')">删除</button></td>
+                `;
+                watchBody.appendChild(tr);
+            }
+        }
+
+        // 初始化
+        document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+        renderAll();
+    </script>
+</body>
+</html>
